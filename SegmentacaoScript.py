@@ -9,6 +9,12 @@ import tkinter.filedialog
 import json
 from PIL import ImageTk, Image
 
+def crop_image():
+    img = Image.open(path)
+    cropped_image = img.crop((area[0][0],area[0][1],area[1][0],area[1][1]))
+    nome_imagem = path[:-4]
+    cropped_image.save(nome_imagem+'_cropped.jpg', "JPEG")
+
 def mouse_pressed(event):
     global area
 
@@ -16,7 +22,6 @@ def mouse_pressed(event):
     ypos = event.y + y_scroll.get()[0] * yres
 
     area = [[xpos, ypos]]
-
 
 
 def mouse_released(event):
@@ -34,16 +39,16 @@ def mouse_released(event):
     print('x'+path)
     data = {}
     data['imageName'] = path
-    data['pontoRecorte00'] = area[0][0]
-    data['pontoRecorte01'] = area[0][1]
-    data['pontoRecorte10'] = area[1][0]
-    data['pontoRecorte11'] = area[1][1]
+    data['pontoRecorteX1'] = area[0][0]
+    data['pontoRecorteY1'] = area[0][1]
+    data['pontoRecorteX2'] = area[1][0]
+    data['pontoRecorteY2'] = area[1][1]
 
-    jsonFile = open(path+'.json',"w+")
+    jsonFile = open(path+'_cropped'+'.json',"w+")
     json.dump(data, jsonFile, sort_keys = True, indent = 4, ensure_ascii = False)
     jsonFile.flush()
     jsonFile.close()
-
+    crop_image()
 
 
 def select_click():
