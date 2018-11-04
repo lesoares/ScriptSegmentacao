@@ -9,28 +9,28 @@ import tkinter.filedialog
 import json
 from PIL import ImageTk, Image
 
-# Controla os clicks do mouse e a criação dos retângulos de seleção
-def mouse_control(event):
+def mouse_pressed(event):
     global area
-    # Corrige as coordenadas de acordo com as Scrollbars
+
     xpos = event.x + x_scroll.get()[0] * xres
     ypos = event.y + y_scroll.get()[0] * yres
 
-    # Coordenadas guardadas em uma lista de tuplas
-    # Guarda apenas as coordenadas do último retângulo
+    area = [[xpos, ypos]]
 
-    area = [(xpos, ypos)]
-                     
- 
+
 
 def mouse_released(event):
     xpos = event.x + x_scroll.get()[0] * xres
     ypos = event.y + y_scroll.get()[0] * yres
-    
-    area.append((xpos, ypos))
+
+    area.append([xpos, ypos])
+
+    area[0][0], area[1][0] = min(area[0][0], area[1][0]), max(area[0][0], area[1][0])
+    area[0][1], area[1][1] = min(area[0][1], area[1][1]), max(area[0][1], area[1][1])
+
     panel.create_rectangle(area[0][0], area[0][1], area[1][0], area[1][1],
                             width = 2, outline = "#00FF00")
-   
+    
     print('x'+path)
     data = {}
     data['imageName'] = path
@@ -38,15 +38,14 @@ def mouse_released(event):
     data['pontoRecorte01'] = area[0][1]
     data['pontoRecorte10'] = area[1][0]
     data['pontoRecorte11'] = area[1][1]
-	
+
     jsonFile = open(path+'.json',"w+")
     json.dump(data, jsonFile, sort_keys = True, indent = 4, ensure_ascii = False)
     jsonFile.flush()
-    jsonFile.close()  
-    
-    
-    
-# Limpa panel e carrega a imagem selecionada nele
+    jsonFile.close()
+
+
+
 def select_click():
     global path
     path = tkinter.filedialog.askopenfilename(initialdir="../Dataset/Nova_pasta/")
@@ -79,7 +78,7 @@ panel.pack(side = "bottom", fill = "x", expand = "yes")
 y_scroll.config(command = panel.yview)
 x_scroll.config(command = panel.xview)
 
-panel.bind("<ButtonPress-1>", mouse_control)
+panel.bind("<ButtonPress-1>", mouse_pressed)
 panel.bind("<ButtonRelease-1>", mouse_released)
 panel.bind()
 
