@@ -9,6 +9,8 @@ import tkinter.filedialog
 import json
 from PIL import ImageTk, Image
 
+
+
 def crop_image():
     img = Image.open(path)
     cropped_image = img.crop((area[0][0],area[0][1],area[1][0],area[1][1]))
@@ -51,6 +53,17 @@ def mouse_released(event):
     crop_image()
 
 
+def righ_click(event):
+    global area
+    global path
+    area = []
+    print('passou '+str(len(image_list)))
+    if len(image_list) > 0:
+        print('existeMais')
+        path = image_list.pop(0)
+        img = ImageTk.PhotoImage(file=path)
+        show_image(img)
+
 def select_click():
     global path
     path = tkinter.filedialog.askopenfilename(initialdir="../Dataset/Nova_pasta/")
@@ -60,15 +73,39 @@ def select_click():
         panel.img = img
         panel.create_image(0, 0, image=img, anchor='nw')
 
+def select_multiple_click():
+    global path
+    selected = tkinter.filedialog.askopenfilenames(initialdir="../Dataset/Nova_pasta/")
+    if(len(selected) > 0):
+        global image_list
+        image_list = list(selected)
+        print('\n list' +str(image_list))
+        path = str(image_list.pop(0))
+        print('\npath ' +path)
+    
+        img = ImageTk.PhotoImage(file=path)
+        show_image(img)
+        
+        
+def show_image(img):
+      panel.delete("all")
+      panel.img = img
+      panel.create_image(0, 0, image=img, anchor='nw')      
+               
+
 
 area = []
 xres, yres = 6000, 4000
+
 
 root = tk.Tk()
 root.title("Segmentação Manual")
 
 select_btn = tk.Button(root, text = "Selecionar Imagem", command = select_click)
 select_btn.pack(side = "top")
+
+select_multiple_btn = tk.Button(root, text = "Selecionar Várias Imagens", command = select_multiple_click)
+select_multiple_btn.pack(side = "top")
 
 y_scroll = tk.Scrollbar(root, orient = "vertical")
 y_scroll.pack(side = "right", fill = "y")
@@ -85,6 +122,7 @@ x_scroll.config(command = panel.xview)
 
 panel.bind("<ButtonPress-1>", mouse_pressed)
 panel.bind("<ButtonRelease-1>", mouse_released)
+panel.bind("<ButtonPress-3>", righ_click)
 panel.bind()
 
 root.mainloop()
